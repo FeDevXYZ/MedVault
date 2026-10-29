@@ -1,20 +1,28 @@
-# This is a sample Python script.
-import datetime
 
-test = True
-# Press Maiusc+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import datetime
+import json
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 warning = 0 # TEST
 choice = 0
 expired = []
 almostExpired = []
 
 medications = [
-    {"medication": "ibuprofen", "expiry": "24/08/2022", "quantity": 30},
-    {"medication": "Enterogermina", "expiry": "02/12/2025", "quantity": 15}
+    {"medication": "ibuprofen", "expiry": "24/08/2022", "quantity": 30, "usedFor": ""},
+    {"medication": "Enterogermina", "expiry": "02/12/2025", "quantity": 15, "usedFor": ""}
 ]
 def Menu():
-    print("")
+    print(bcolors.OKBLUE)
     print("╔═══════════════════════════╗")
     print("║  What do you want to do?  ║")
     print("║  1. Add a new product     ║")
@@ -24,7 +32,7 @@ def Menu():
     print("║  5. Quit                  ║")
     print("╚═══════════════════════════╝")
     try:
-        choice = int(input("Enter your choice: "))
+        choice = int(input(bcolors.ENDC + "Enter your choice: "))
         return choice
     except ValueError:
         return 0
@@ -54,7 +62,7 @@ def showMedications():
             m["expiry"].ljust(13),
             m["quantity"]
         )
-# Press the green button in the gutter to run the script.
+
 if __name__ == '__main__':
     debug = False
     # debug = input("Debug mode? (Y/N)")
@@ -62,13 +70,13 @@ if __name__ == '__main__':
     #    debug = True
     # else:
     #    debug = False
-    print("◤◢◣◥◤◢◣◥◤◢◣◥◤◢◣◥")
-    print("▮      Welcome to MedVault     ▮")
-    print("◣◥◤◢◣◥◤◢◣◥◤◢◣◥◤◢")
+    print(bcolors.HEADER + "◤◢◣◥◤◢◣◥◤◢◣◥◤◢◣◥" + bcolors.ENDC)
+    print(bcolors.HEADER + "▮      Welcome to MedVault     ▮" + bcolors.ENDC)
+    print(bcolors.HEADER + "◣◥◤◢◣◥◤◢◣◥◤◢◣◥◤◢" + bcolors.ENDC)
     print("")
     warning, almostWarning = checkWarnings()
     total = warning + almostWarning
-    print("╔══════════════════════════╗")
+    print(bcolors.OKCYAN + "╔══════════════════════════╗")
     if total == 0:
         print("    You have no warnings.   ")
     elif total == 1:
@@ -83,10 +91,10 @@ if __name__ == '__main__':
             if debug:
                 print("[DEBUG] Add a new product")
             print("")
-            name = input("Insert the product name here or type 'back' to return:")
+            name = input("Insert the product name here or type 'back' to return: ")
             if name.lower() == "back":
                 break
-            expiry = input("Insert the expiry date (DD/MM/YYYY):")
+            expiry = input("Insert the expiry date (DD/MM/YYYY): ")
             while True:
                 try:
                     datetime.datetime.strptime(expiry, "%d/%m/%Y")
@@ -95,34 +103,36 @@ if __name__ == '__main__':
                 except ValueError:
                     valida = False
                     print("Date not valid. Please try again.")
-                    expiry = input("Insert the expiry date (DD/MM/YYYY):")
+                    expiry = input("Insert the expiry date (DD/MM/YYYY): ")
             while True:
                 try:
                     quantity = int(input("Insert the quantity: "))
                     break
                 except ValueError:
                     print("Quantity must be a number.")
-            medications.append({"medication": name, "expiry": expiry, "quantity": quantity})
+            print("Optional Values (press Enter to leave blank)")
+            answer = input("Insert what it is used for (e.g. headache, stomachache): ")
+            medications.append({"medication": name, "expiry": expiry, "quantity": quantity, "usedFor": answer})
         elif choice == 2:
             print("")
             if debug:
                 print("[DEBUG] Remove a product")
             while True:
                 found = False
-                risposta = input("Insert the product name here or type 'list' to view all products, type 'back' to return: ")
-                if risposta.lower() == "list":
+                answer = input("Insert the product name here or type 'list' to view all products, type 'back' to return: ")
+                if answer.lower() == "list":
                     showMedications()
-                elif risposta.lower() == "back":
+                elif answer.lower() == "back":
                     break
                 else:
                     for m in medications:
-                        if risposta.lower() == m["medication"].lower():
+                        if answer.lower() == m["medication"].lower():
                             print(f"Medication {m['medication']} removed.")
                             medications.remove(m)
                             found = True
                             break
                     if found == False:
-                        print(f"Medication {risposta} not found. Try again.")
+                        print(f"Medication {answer} not found. Try again.")
                     else:
                         break
         elif choice == 3:
@@ -141,7 +151,7 @@ if __name__ == '__main__':
                 print("║   You have no warnings.  ║")
                 print("╚══════════════════════════╝")
         elif choice == 5:
-            exit("Goodbye! ")
+            exit("Goodbye!")
         else:
             print("Choice is not valid. (1-5)")
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
