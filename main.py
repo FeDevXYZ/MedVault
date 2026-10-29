@@ -141,7 +141,7 @@ if __name__ == '__main__':
                 print("║   You have no warnings.  ║")
                 print("╚══════════════════════════╝")
         elif choice == 5:
-            exit("Goodbye!")
+            exit("Goodbye! ")
         else:
             print("Choice is not valid. (1-5)")
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
