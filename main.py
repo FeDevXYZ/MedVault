@@ -21,12 +21,6 @@ expired = []
 almostExpired = []
 
 medications = [
-    {"ID": "1", "medication": "ibuprofen", "expiry": "24/08/2022", "quantity": 30, "usedFor": "Fever, headache",
-     "opened": "-"},
-    {"ID": "2", "medication": "Enterogermina", "expiry": "02/12/2025", "quantity": 15, "usedFor": "Stomachache",
-     "opened": "-"},
-    {"ID": "3", "medication": "ibuprofen", "expiry": "24/08/1522", "quantity": 0, "usedFor": "Fever, headache",
-     "opened": "-"}
 ]
 
 
@@ -47,7 +41,6 @@ def Menu():
     except ValueError:
         return 0
 
-
 def checkWarnings():
     expired.clear()
     almostExpired.clear()
@@ -66,7 +59,6 @@ def checkWarnings():
     almostWarning = len(almostExpired)
     return warning, almostWarning
 
-
 def showMedications():
     print("Medication".ljust(20), "Expiry".ljust(13), "Quantity".ljust(13), "Opened")
     print("-" * 60)
@@ -78,55 +70,91 @@ def showMedications():
             m["opened"]
         )
 
+def clear(frame):
+    for w in frame.winfo_children():
+        w.destroy()
 
 def addProduct():
+    global qualeProd
+    global qualeExp
+    clear(answer)
     print("Add")
     action.set("Add product")
+    tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw", ipady=20)
+    tk.Label(answer, text="Insert product name:", justify="left").pack(anchor="nw")
+    qualeProd = tk.Entry(answer)
+    qualeProd.pack(fill="x", anchor="nw")
+    tk.Label(answer, text="Insert expiry date (DD/MM/YYYY):", justify="left").pack(anchor="nw")
+    qualeExp = tk.Entry(answer)
+    qualeExp.pack(fill="x", anchor="nw")
+    tk.Button(answer, text="Save", command=save).pack(anchor="nw")
+def save():
+    saveProd()
+    saveExp()
+def saveProd():
+    savedProd = qualeProd.get()
+    print(savedProd)
+def saveExp():
+    savedExp = qualeExp.get()
+    print(savedExp)
 
 def removeProduct():
+    clear(answer)
     print("Remove")
     action.set("Remove product")
+    tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw")
+    qualeProd = ""
 
 def listProducts():
+    clear(answer)
     print("List products")
     action.set("List products")
+    tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw")
 
 def readWarnings():
+    clear(answer)
     print("Read warnings")
     action.set("Read warnings")
+    tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw")
 
 def addOpenDate():
+    clear(answer)
     print("Add opening date")
     action.set("Add opening date")
+    tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw")
 
 def goodbye():
+    clear(answer)
     action.set("Exit")
     exit(9)
 
 
 if __name__ == '__main__':
-    root = tk.Tk()
-    root.title("MedVault")
-    root.geometry("500x500")
-    action = tk.StringVar()
+    MODE = input("Do you want to start Tkinter Medvault? WIP, may contain bugs (Y/N): ")
+    if MODE.lower() == "y":
+        saved = ""
+        root = tk.Tk()
+        root.title("MedVault")
+        root.geometry("500x500")
+        root.resizable(False, False)
+        action = tk.StringVar()
 
-    buttons = tk.Frame(root, pady=20, padx=20)
-    buttons.pack(side="left", fill="y")
+        buttons = tk.Frame(root, pady=20, padx=20)
+        buttons.pack(side="left", fill="y")
 
-    answer = tk.Frame(root, pady=20, padx=20)
-    answer.pack(side="left", fill="both", expand=True)
+        answer = tk.Frame(root, pady=20, padx=20)
+        answer.pack(side="left", fill="both", expand=True)
 
-    tk.Label(buttons, text="Welcome to MedVault", bg="red").pack(ipadx=5, ipady=5, pady=10)
-    tk.Button(buttons, text="Add product", command=addProduct).pack(fill="x")
-    tk.Button(buttons, text="Remove product", command=removeProduct).pack(fill="x")
-    tk.Button(buttons, text="List products", command=listProducts).pack(fill="x")
-    tk.Button(buttons, text="Read warnings", command=readWarnings).pack(fill="x")
-    tk.Button(buttons, text="Add opening date", command=addOpenDate).pack(fill="x")
-    tk.Button(buttons, text="Exit", command=goodbye).pack(fill="x")
+        tk.Label(buttons, text="Welcome to MedVault", bg="red").pack(ipadx=5, ipady=5, pady=10)
+        tk.Button(buttons, text="Add product", command=addProduct).pack(fill="x")
+        tk.Button(buttons, text="Remove product", command=removeProduct).pack(fill="x")
+        tk.Button(buttons, text="List products", command=listProducts).pack(fill="x")
+        tk.Button(buttons, text="Read warnings", command=readWarnings).pack(fill="x")
+        tk.Button(buttons, text="Add opening date", command=addOpenDate).pack(fill="x")
+        tk.Button(buttons, text="Exit", command=goodbye).pack(fill="x")
 
-    tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw")
-
-    root.mainloop()
+        root.mainloop()
+        exit("Tkinter closed.")
     debug = False
     # debug = input("Debug mode? (Y/N)")
     # if (debug == "Y" or debug == "y"):
@@ -174,9 +202,9 @@ if __name__ == '__main__':
                     break
                 except ValueError:
                     print("Quantity must be a number.")
-            print("Optional Values (press Enter to leave blank)")
-            answer = input("Insert what it is used for (e.g. headache, stomachache): ")
-            medications.append({"ID": ID, "medication": name, "expiry": expiry, "quantity": quantity, "usedFor": answer,
+            # print("Optional Values (press Enter to leave blank)")
+            # answer = input("Insert what it is used for (e.g. headache, stomachache): ")
+            medications.append({"ID": ID, "medication": name, "expiry": expiry, "quantity": quantity,
                                 "opened": "-"})
         elif choice == 2:
             print("")
