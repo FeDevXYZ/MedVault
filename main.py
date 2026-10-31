@@ -1,4 +1,7 @@
 import datetime
+import tkinter as tk
+from tkinter import ttk
+
 
 class bcolors:
     HEADER = '\033[95m'
@@ -10,16 +13,23 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-warning = 0 # TEST
+
+
+warning = 0  # TEST
 choice = 0
 expired = []
 almostExpired = []
 
 medications = [
-    {"ID": "1", "medication": "ibuprofen", "expiry": "24/08/2022", "quantity": 30, "usedFor": "Fever, headache", "opened": "-"},
-    {"ID": "2", "medication": "Enterogermina", "expiry": "02/12/2025", "quantity": 15, "usedFor": "Stomachache", "opened": "-"},
-    {"ID": "3", "medication": "ibuprofen", "expiry": "24/08/1522", "quantity": 0, "usedFor": "Fever, headache", "opened": "-"}
+    {"ID": "1", "medication": "ibuprofen", "expiry": "24/08/2022", "quantity": 30, "usedFor": "Fever, headache",
+     "opened": "-"},
+    {"ID": "2", "medication": "Enterogermina", "expiry": "02/12/2025", "quantity": 15, "usedFor": "Stomachache",
+     "opened": "-"},
+    {"ID": "3", "medication": "ibuprofen", "expiry": "24/08/1522", "quantity": 0, "usedFor": "Fever, headache",
+     "opened": "-"}
 ]
+
+
 def Menu():
     print(bcolors.OKBLUE)
     print("╔════════════════════════════╗")
@@ -36,6 +46,8 @@ def Menu():
         return choice
     except ValueError:
         return 0
+
+
 def checkWarnings():
     expired.clear()
     almostExpired.clear()
@@ -45,13 +57,15 @@ def checkWarnings():
     for m in medications:
         expirydate = datetime.datetime.strptime(m["expiry"], "%d/%m/%Y").date()
         medicationname = m["medication"]
-        if(today>=expirydate):
-            expired.append({"medication": medicationname, "days": (today-expirydate).days})
-        elif ((expirydate - datetime.timedelta(days=10))<= today):
-            almostExpired.append({"medication": medicationname, "expiry": m["expiry"], "daysUntil": (expirydate - today).days})
+        if (today >= expirydate):
+            expired.append({"medication": medicationname, "days": (today - expirydate).days})
+        elif ((expirydate - datetime.timedelta(days=10)) <= today):
+            almostExpired.append(
+                {"medication": medicationname, "expiry": m["expiry"], "daysUntil": (expirydate - today).days})
     warning = len(expired)
     almostWarning = len(almostExpired)
     return warning, almostWarning
+
 
 def showMedications():
     print("Medication".ljust(20), "Expiry".ljust(13), "Quantity".ljust(13), "Opened")
@@ -64,7 +78,55 @@ def showMedications():
             m["opened"]
         )
 
+
+def addProduct():
+    print("Add")
+    action.set("Add product")
+
+def removeProduct():
+    print("Remove")
+    action.set("Remove product")
+
+def listProducts():
+    print("List products")
+    action.set("List products")
+
+def readWarnings():
+    print("Read warnings")
+    action.set("Read warnings")
+
+def addOpenDate():
+    print("Add opening date")
+    action.set("Add opening date")
+
+def goodbye():
+    action.set("Exit")
+    exit(9)
+
+
 if __name__ == '__main__':
+    root = tk.Tk()
+    root.title("MedVault")
+    root.geometry("500x500")
+    action = tk.StringVar()
+
+    buttons = tk.Frame(root, pady=20, padx=20)
+    buttons.pack(side="left", fill="y")
+
+    answer = tk.Frame(root, pady=20, padx=20)
+    answer.pack(side="left", fill="both", expand=True)
+
+    tk.Label(buttons, text="Welcome to MedVault", bg="red").pack(ipadx=5, ipady=5, pady=10)
+    tk.Button(buttons, text="Add product", command=addProduct).pack(fill="x")
+    tk.Button(buttons, text="Remove product", command=removeProduct).pack(fill="x")
+    tk.Button(buttons, text="List products", command=listProducts).pack(fill="x")
+    tk.Button(buttons, text="Read warnings", command=readWarnings).pack(fill="x")
+    tk.Button(buttons, text="Add opening date", command=addOpenDate).pack(fill="x")
+    tk.Button(buttons, text="Exit", command=goodbye).pack(fill="x")
+
+    tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw")
+
+    root.mainloop()
     debug = False
     # debug = input("Debug mode? (Y/N)")
     # if (debug == "Y" or debug == "y"):
@@ -114,14 +176,16 @@ if __name__ == '__main__':
                     print("Quantity must be a number.")
             print("Optional Values (press Enter to leave blank)")
             answer = input("Insert what it is used for (e.g. headache, stomachache): ")
-            medications.append({"ID": ID, "medication": name, "expiry": expiry, "quantity": quantity, "usedFor": answer, "opened": "-"})
+            medications.append({"ID": ID, "medication": name, "expiry": expiry, "quantity": quantity, "usedFor": answer,
+                                "opened": "-"})
         elif choice == 2:
             print("")
             if debug:
                 print("[DEBUG] Remove a product")
             while True:
-                found = False
-                answer = input("Insert the product name here or type 'list' to view all products, type 'back' to return: ")
+                found = 0
+                answer = input(
+                    "Insert the product name here or type 'list' to view all products, type 'back' to return: ")
                 if answer.lower() == "list":
                     showMedications()
                 elif answer.lower() == "back":
@@ -173,50 +237,49 @@ if __name__ == '__main__':
                 print("║   You have no warnings.  ║")
                 print("╚══════════════════════════╝")
         elif choice == 5:
-                found = False  # <-- 1. azzerato ogni volta
-                selected = None  # <-- 1.
-                answer = input("Insert the product where you want to add an opening date: ")
-                if answer.lower() == "list":
-                    showMedications()
-                elif answer.lower() == "back":
-                    continue  # <-- 2. era break (chiudeva il programma)
-                else:
-                    matches = []
-                    matches.clear()
-                    nfound = 0
-                    for m in medications:
-                        if answer.lower() == m["medication"].lower():
-                            nfound = nfound + 1
-                            matches.append(m)
-                            # print(f"Medication {m['medication']} removed.")
-                    for m in medications:
-                        if answer.lower() == m["medication"].lower() and nfound == 1:
-                            print(f"Medication {m['medication']} found.")
+            found = False  # <-- 1. azzerato ogni volta
+            selected = None  # <-- 1.
+            answer = input("Insert the product where you want to add an opening date: ")
+            if answer.lower() == "list":
+                showMedications()
+            elif answer.lower() == "back":
+                continue  # <-- 2. era break (chiudeva il programma)
+            else:
+                matches = []
+                matches.clear()
+                nfound = 0
+                for m in medications:
+                    if answer.lower() == m["medication"].lower():
+                        nfound = nfound + 1
+                        matches.append(m)
+                        # print(f"Medication {m['medication']} removed.")
+                for m in medications:
+                    if answer.lower() == m["medication"].lower() and nfound == 1:
+                        print(f"Medication {m['medication']} found.")
+                        found = True
+                        selected = m["ID"]  # <-- 3. mancava nel caso del farmaco unico
+                        break
+                if nfound > 1:
+                    n = 1
+                    for m in matches:
+                        print(f"{m["ID"]}. {m["medication"]} - Expiry: {m["expiry"]} - Quantity: {m["quantity"]}")
+                        n = n + 1
+                    chosenID = input("Type the ID of the product to select: ")
+                    for m in matches:
+                        if str(m["ID"]) == chosenID:
+                            print(f"Medication {m['medication']} (ID {m['ID']}) found.")
                             found = True
-                            selected = m["ID"]  # <-- 3. mancava nel caso del farmaco unico
+                            selected = m["ID"]
                             break
-                    if nfound > 1:
-                        n = 1
-                        for m in matches:
-                            print(f"{m["ID"]}. {m["medication"]} - Expiry: {m["expiry"]} - Quantity: {m["quantity"]}")
-                            n = n + 1
-                        chosenID = input("Type the ID of the product to select: ")
-                        for m in matches:
-                            if str(m["ID"]) == chosenID:
-                                print(f"Medication {m['medication']} (ID {m['ID']}) found.")
-                                found = True
-                                selected = m["ID"]
-                                break
-                    if found == False:
-                        print(f"Medication {answer} not found. Try again.")
-                    else:  # <-- 4. il salvataggio è qui dentro
-                        for m in medications:
-                            if m["ID"] == selected:
-                                m["opened"] = datetime.date.today().strftime("%d/%m/%Y")
-                        print(f"Opening date added ({datetime.datetime.today().strftime("%d/%m/%Y")})")
+                if found == False:
+                    print(f"Medication {answer} not found. Try again.")
+                else:  # <-- 4. il salvataggio è qui dentro
+                    for m in medications:
+                        if m["ID"] == selected:
+                            m["opened"] = datetime.date.today().strftime("%d/%m/%Y")
+                    print(f"Opening date added ({datetime.datetime.today().strftime("%d/%m/%Y")})")
         elif choice == 6:
             exit("Goodbye!")
         else:
             print("Choice is not valid. (1-5)")
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
-
