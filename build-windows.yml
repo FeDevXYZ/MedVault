@@ -1,0 +1,36 @@
+name: Build Windows exe
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to attach the exe to (e.g. v1.1-alpha)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pip install pyinstaller tkcalendar
+
+      - name: Build exe
+        run: pyinstaller --onefile --name MedVault --hidden-import babel.numbers main.py
+
+      - name: Upload exe to the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: gh release upload "$TAG" dist/MedVault.exe --clobber
