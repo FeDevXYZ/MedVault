@@ -1,6 +1,5 @@
 import datetime
 import tkinter as tk
-from tkinter import ttk
 
 
 class bcolors:
@@ -77,6 +76,8 @@ def clear(frame):
 def addProduct():
     global qualeProd
     global qualeExp
+    global qualeQuant
+    global qualeOpen
     clear(answer)
     print("Add")
     action.set("Add product")
@@ -87,16 +88,32 @@ def addProduct():
     tk.Label(answer, text="Insert expiry date (DD/MM/YYYY):", justify="left").pack(anchor="nw")
     qualeExp = tk.Entry(answer)
     qualeExp.pack(fill="x", anchor="nw")
+    tk.Label(answer, text="Insert quantity:", justify="left").pack(anchor="nw")
+    qualeQuant = tk.Entry(answer)
+    qualeQuant.pack(fill="x", anchor="nw")
+    tk.Label(answer, text="Optional values", justify="left").pack(anchor="nw")
+    tk.Label(answer, text="Add an opening date (DD/MM/YYYY):", justify="left").pack(anchor="nw")
+    qualeOpen = tk.Entry(answer)
+    qualeOpen.pack(fill="x", anchor="nw")
     tk.Button(answer, text="Save", command=save).pack(anchor="nw")
+
 def save():
     saveProd()
     saveExp()
+    saveQuant()
+    saveOpen()
 def saveProd():
     savedProd = qualeProd.get()
     print(savedProd)
 def saveExp():
     savedExp = qualeExp.get()
     print(savedExp)
+def saveQuant():
+    savedQuant = qualeQuant.get()
+    print(savedQuant)
+def saveOpen():
+    savedOpen = qualeOpen.get()
+    print(savedOpen)
 
 def removeProduct():
     clear(answer)
@@ -182,10 +199,10 @@ if __name__ == '__main__':
             if debug:
                 print("[DEBUG] Add a new product")
             print("")
-            ID = str(max(int(m["ID"]) for m in medications) + 1)
+            ID = str(max((int(m["ID"]) for m in medications), default=0) + 1)
             name = input("Insert the product name here or type 'back' to return: ")
             if name.lower() == "back":
-                break
+                continue
             expiry = input("Insert the expiry date (DD/MM/YYYY): ")
             while True:
                 try:
@@ -202,9 +219,10 @@ if __name__ == '__main__':
                     break
                 except ValueError:
                     print("Quantity must be a number.")
-            # print("Optional Values (press Enter to leave blank)")
-            # answer = input("Insert what it is used for (e.g. headache, stomachache): ")
-            medications.append({"ID": ID, "medication": name, "expiry": expiry, "quantity": quantity,
+            print("Optional Values (press Enter to leave blank)")
+            answer = input("Insert what it is used for (e.g. headache, stomachache): ")
+            print(f"Medication {name} added to the software.")
+            medications.append({"ID": ID, "medication": name, "expiry": expiry, "quantity": quantity, "usedFor": answer,
                                 "opened": "-"})
         elif choice == 2:
             print("")
