@@ -2,19 +2,16 @@ import datetime
 import tkinter as tk
 from tkinter import ttk
 from tkcalendar import Calendar
+import tkinter.font as tkFont
+import sys
+
 
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
     OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
     ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-class symbols:
-    DOT = '\u2022'
 
 warning = 0  # TEST
 choice = 0
@@ -266,6 +263,10 @@ if __name__ == '__main__':
     if MODE.lower() == "y":
         saved = ""
         root = tk.Tk()
+        FAMILY = "Segoe UI" if sys.platform == "win32" else "DejaVu Sans"
+        for n in ("TkDefaultFont", "TkTextFont", "TkMenuFont", "TkHeadingFont"):
+            tkFont.nametofont(n).configure(family=FAMILY, size=-12, weight="normal")
+        CAL_FONT = (FAMILY, -13)
         root.title("MedVault")
         root.geometry("560x650")
         root.resizable(False, False)
@@ -277,7 +278,7 @@ if __name__ == '__main__':
         answer = tk.Frame(root, pady=20, padx=20)
         answer.pack(side="left", fill="both", expand=True)
 
-        tk.Label(buttons, text="Welcome to MedVault", bg="red").pack(ipadx=5, ipady=5, pady=10)
+        tk.Label(buttons, text="Welcome to MedVault", bg="PaleTurquoise1").pack(ipadx=5, ipady=5, pady=10)
         tk.Button(buttons, text="Add product", command=addProduct).pack(fill="x")
         tk.Button(buttons, text="Remove product", command=removeProduct).pack(fill="x")
         tk.Button(buttons, text="List products", command=listProducts).pack(fill="x")
@@ -397,13 +398,14 @@ if __name__ == '__main__':
                 print("║   You have no warnings.  ║")
                 print("╚══════════════════════════╝")
         elif choice == 5:
-            found = False  # <-- 1. azzerato ogni volta
-            selected = None  # <-- 1.
+            test = ""
+            found = False
+            selected = None
             answer = input("Insert the product where you want to add an opening date: ")
             if answer.lower() == "list":
                 showMedications()
             elif answer.lower() == "back":
-                continue  # <-- 2. era break (chiudeva il programma)
+                continue
             else:
                 matches = []
                 matches.clear()
@@ -412,12 +414,11 @@ if __name__ == '__main__':
                     if answer.lower() == m["medication"].lower():
                         nfound = nfound + 1
                         matches.append(m)
-                        # print(f"Medication {m['medication']} removed.")
                 for m in medications:
                     if answer.lower() == m["medication"].lower() and nfound == 1:
                         print(f"Medication {m['medication']} found.")
                         found = True
-                        selected = m["ID"]  # <-- 3. mancava nel caso del farmaco unico
+                        selected = m["ID"]
                         break
                 if nfound > 1:
                     n = 1
@@ -433,7 +434,7 @@ if __name__ == '__main__':
                             break
                 if found == False:
                     print(f"Medication {answer} not found. Try again.")
-                else:  # <-- 4. il salvataggio è qui dentro
+                else:
                     for m in medications:
                         if m["ID"] == selected:
                             m["opened"] = datetime.date.today().strftime("%d/%m/%Y")
@@ -441,5 +442,5 @@ if __name__ == '__main__':
         elif choice == 6:
             exit("Goodbye!")
         else:
-            print("Choice is not valid. (1-5)")
+            print("Choice is not valid. (1-6)")
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
