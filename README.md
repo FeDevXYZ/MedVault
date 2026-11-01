@@ -9,9 +9,8 @@ A Python script that makes medication management smart and easy, reducing waste 
 ## Screenshots
 
 ![MedVault Terminal](docs/terminal.png)
-MedVault Terminal
 ![MedVault Tkinter](docs/tkinter.png)
-MedVault Tkinter
+
 
 
 ## Features
@@ -26,16 +25,25 @@ MedVault Tkinter
 
 
 ## Installing and running
-
+WINDOWS:
 1. Go to the releases page
 2. Download the .exe file
 3. Run the .exe file
-    
+
+LINUX (could change from distro to distro):
+1. Go to the releases page
+2. Download the ...-linux file
+3. Run the ...-linux file
+
+### Advices
+- On Windows, you should and need to resize your window because some elements may appear broken on the original dimensions. I wouldn't reccomend doing this on Linux, where everything should fit nicely.
+- When using the program from the ...-linux or .exe file the exit button won't work.
+
 ## FAQ
 
 #### What operating systems does MedVault run on?
 
-MedVault only runs with Windows, however, you can run MedVault on MacOS and Linux by downloading main.py from the assets, downloading the dependencies and running the file.
+MedVault only runs with Windows and Linux, however, you can run MedVault on MacOS by downloading main.py from the assets, downloading the dependencies and running the file.
 
 #### Does MedVault update automatically?
 
