@@ -269,7 +269,6 @@ if __name__ == '__main__':
         CAL_FONT = (FAMILY, -13)
         root.title("MedVault")
         root.geometry("560x650")
-        root.resizable(False, False)
         action = tk.StringVar()
 
         buttons = tk.Frame(root, pady=20, padx=20)
