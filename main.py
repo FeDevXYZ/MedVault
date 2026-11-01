@@ -255,7 +255,7 @@ def readWarnings():
 def goodbye():
     clear(answer)
     action.set("Exit")
-    exit(9)
+    sys.exit(9)
 
 
 if __name__ == '__main__':
@@ -285,7 +285,7 @@ if __name__ == '__main__':
         tk.Button(buttons, text="Exit", command=goodbye).pack(fill="x")
 
         root.mainloop()
-        exit("Tkinter closed.")
+        sys.exit("Tkinter closed.")
     debug = False
     # debug = input("Debug mode? (Y/N)")
     # if (debug == "Y" or debug == "y"):
@@ -439,7 +439,7 @@ if __name__ == '__main__':
                             m["opened"] = datetime.date.today().strftime("%d/%m/%Y")
                     print(f"Opening date added ({datetime.datetime.today().strftime("%d/%m/%Y")})")
         elif choice == 6:
-            exit("Goodbye!")
+            sys.exit("Goodbye!")
         else:
             print("Choice is not valid. (1-6)")
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
