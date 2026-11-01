@@ -1,7 +1,7 @@
-import time
 import datetime
 import tkinter as tk
-from tkcalendar import Calendar, DateEntry
+from tkinter import ttk
+from tkcalendar import Calendar
 
 class bcolors:
     HEADER = '\033[95m'
@@ -13,7 +13,8 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-
+class symbols:
+    DOT = '\u2022'
 
 warning = 0  # TEST
 choice = 0
@@ -21,10 +22,10 @@ expired = []
 almostExpired = []
 
 medications = [
+    {"ID":1, "medication":"Enterogermina", "expiry":"10/10/2026", "quantity":30, "opened": "-"},
+    {"ID":2, "medication":"Ibuprofen", "expiry":"01/12/2029", "quantity":10, "opened": "-"}
 ]
-avvisi = [
-
-]
+avvisi = []
 
 def Menu():
     print(bcolors.OKBLUE)
@@ -47,8 +48,6 @@ def checkWarnings():
     expired.clear()
     almostExpired.clear()
     today = datetime.datetime.now().date()
-    if debug:
-        print("[DEBUG] Warning check")
     for m in medications:
         expirydate = datetime.datetime.strptime(m["expiry"], "%d/%m/%Y").date()
         medicationname = m["medication"]
@@ -88,7 +87,6 @@ def addProduct():
     condText = tk.StringVar()
 
     clear(answer)
-    print("Add")
     action.set("Add product")
     tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw")
     tk.Label(answer, text="", justify="left").pack(anchor="nw")
@@ -97,7 +95,7 @@ def addProduct():
     qualeProd.pack(fill="x", anchor="nw")
     tk.Label(answer, text="Insert expiry date (DD/MM/YYYY):", justify="left").pack(anchor="nw")
     qualeExp = Calendar(answer,
-                font="Arial 14", selectmode='day', cursor="hand1")
+                font="Arial 14", selectmode='day', cursor="hand1", date_pattern="dd/mm/yyyy")
     qualeExp.pack(fill="x", anchor="nw")
     tk.Label(answer, text="Insert quantity:", justify="left").pack(anchor="nw")
     qualeQuant = tk.Entry(answer)
@@ -108,9 +106,11 @@ def addProduct():
     optValues.pack(anchor="nw")
     tk.Label(answer, text="Add an opening date:", justify="left").pack(anchor="nw")
     qualeOpen = Calendar(answer,
-                font="Arial 14", selectmode='day', cursor="hand1")
+                font="Arial 14", selectmode='day', cursor="hand1", date_pattern="dd/mm/yyyy")
     qualeOpen.pack(fill="x", anchor="nw")
-
+    qualeExp.selection_clear()
+    qualeOpen.selection_clear()
+    tk.Label(answer, text="", justify="left").pack(anchor="nw")
     tk.Button(answer, text="Save", command=save1).pack(anchor="nw")
 
     tk.Label(answer, text="").pack(anchor="nw")
@@ -122,19 +122,21 @@ def save1():
     saveProd()
     saveExp()
     saveQuant()
-    saveOptional()
     saveOpen()
     if avvisi:
         condText.set("Please correct the errors below.")
         avvisiVar.set("\n".join(avvisi))
     else:
+        avvisiVar.set("")
+        ID = str(max((int(m["ID"]) for m in medications), default=0) + 1)
+        medications.append({"ID": ID, "medication": savedProd, "expiry": savedExp, "quantity": savedQuant, "usedFor": "-", "opened": savedOpen})
         condText.set("Product saved.")
         qualeProd.delete(0, tk.END)
         qualeQuant.delete(0, tk.END)
         qualeExp.selection_clear()
         qualeOpen.selection_clear()
 
-        root.after(3000, addProduct)
+        root.after(3000, condClear)
 
 def saveProd():
     global savedProd
@@ -155,39 +157,103 @@ def saveQuant():
         avvisi.append("Quantity is blank or not a number.")
 def saveOpen():
     global savedOpen
-    if savedOpt:
+    if saveOptional():
         savedOpen = qualeOpen.get_date()
     else:
         savedOpen = "-"
+    return savedOpen
 def saveOptional():
-    global savedOpt
     savedOpt = optVar.get()
-
+    return savedOpt
+def condClear():
+    condText.set("")
 
 def removeProduct():
+    global productname
+    global medAvailable
+    global saveButt
+    global feedback
+    global products
+    feedback = tk.StringVar()
+    medAvailable = tk.StringVar()
+    productVar = tk.StringVar()
+    products = [
+        f"{m['medication']} - Expiry: {m['expiry']}"
+        for m in medications
+    ]
+
     clear(answer)
-    print("Remove")
     action.set("Remove product")
     tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw")
-    qualeProd = ""
+    tk.Label(answer, text="", justify="left").pack(anchor="nw")
+    productname = ttk.Combobox(answer, textvariable=productVar, values=products, state="readonly")
+    productname.pack(anchor="nw", fill="x")
+    tk.Label(answer, textvariable=medAvailable, justify="left").pack(anchor="nw")
+    saveButt = tk.Button(answer, text="Confirm", command=save2)
+    saveButt.pack(anchor="nw")
+    tk.Label(answer, textvariable=feedback, justify="left").pack(anchor="nw")
+
+    if not medications:
+        productname.config(state="disabled")
+        medAvailable.set("No products available.")
+        saveButt.config(state="disabled")
+    else:
+        productname.config(state="readonly")
+        medAvailable.set("")
+        saveButt.config(state="normal")
+
+def save2():
+    global productname
+    selected = productname.current()
+    if selected == -1:
+        feedback.set("Please select a product.")
+    else:
+        m = medications[selected]
+        medications.remove(m)
+        feedback.set("Product removed.")
+        if not medications:
+            productname.config(state="disabled")
+            medAvailable.set("No products available.")
+            saveButt.config(state="disabled")
+        else:
+            productname.config(state="readonly")
+            medAvailable.set("")
+            saveButt.config(state="normal")
+        productname.config(value = [
+            f"{m['medication']} - Expiry: {m['expiry']}"
+            for m in medications
+        ])
+        productname.set("")
+        root.after(3000, feedbackClear)
+def feedbackClear():
+    feedback.set("")
 
 def listProducts():
     clear(answer)
-    print("List products")
     action.set("List products")
     tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw")
+    tk.Label(answer, text="", justify="left").pack(anchor="nw")
+    for m in medications:
+        tk.Label(answer, text=f"|{m["medication"]}   Quantity: {m["quantity"]}   Expiry: {m["expiry"]}   Opened: {m["opened"]}", justify="left", font=("Arial", 14), wraplength=350).pack(anchor="nw")
 
 def readWarnings():
+    warning, expiring = checkWarnings()
+
     clear(answer)
-    print("Read warnings")
     action.set("Read warnings")
     tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw")
-
-def addOpenDate():
-    clear(answer)
-    print("Add opening date")
-    action.set("Add opening date")
-    tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw")
+    tk.Label(answer, text="", justify="left").pack(anchor="nw")
+    tk.Label(answer, text="Expired:", justify="left").pack(anchor="nw")
+    for e in expired:
+        tk.Label(answer, text=f"The medication {e["medication"]} is expired. It expired {e["days"]} days ago.", justify="left", wraplength=350).pack(anchor="nw")
+    if not expired:
+        tk.Label(answer, text="There are no expired products.", justify="left", wraplength=350).pack(anchor="nw")
+    tk.Label(answer, text="", justify="left").pack(anchor="nw")
+    tk.Label(answer, text="Expiring soon:", justify="left").pack(anchor="nw")
+    for a in almostExpired:
+        tk.Label(answer, text=f"The medication {a["medication"]} is expiring soon. It will expire in {a["daysUntil"]} days.", justify="left", wraplength=350).pack(anchor="nw")
+    if not almostExpired:
+        tk.Label(answer, text="There are no products that are almost expired.", justify="left", wraplength=350).pack(anchor="nw")
 
 def goodbye():
     clear(answer)
@@ -201,7 +267,7 @@ if __name__ == '__main__':
         saved = ""
         root = tk.Tk()
         root.title("MedVault")
-        root.geometry("500x650")
+        root.geometry("560x650")
         root.resizable(False, False)
         action = tk.StringVar()
 
@@ -216,7 +282,6 @@ if __name__ == '__main__':
         tk.Button(buttons, text="Remove product", command=removeProduct).pack(fill="x")
         tk.Button(buttons, text="List products", command=listProducts).pack(fill="x")
         tk.Button(buttons, text="Read warnings", command=readWarnings).pack(fill="x")
-        tk.Button(buttons, text="Add opening date", command=addOpenDate).pack(fill="x")
         tk.Button(buttons, text="Exit", command=goodbye).pack(fill="x")
 
         root.mainloop()
