@@ -28,19 +28,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: Install Tk (Linux only)
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y python3-tk
-
-      - name: Install dependencies
-        run: pip install pyinstaller tkcalendar
+      - uses: astral-sh/setup-uv@v6
 
       - name: Build
-        run: pyinstaller --onefile --name ${{ matrix.name }} --hidden-import babel.numbers main.py
+        env:
+          APP_NAME: ${{ matrix.name }}
+        run: uv run --python 3.14 --with pyinstaller pyinstaller MedVault.spec
 
       - name: Upload to the release
         shell: bash
