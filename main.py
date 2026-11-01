@@ -1,6 +1,7 @@
+import time
 import datetime
 import tkinter as tk
-
+from tkcalendar import Calendar, DateEntry
 
 class bcolors:
     HEADER = '\033[95m'
@@ -21,7 +22,9 @@ almostExpired = []
 
 medications = [
 ]
+avvisi = [
 
+]
 
 def Menu():
     print(bcolors.OKBLUE)
@@ -78,42 +81,88 @@ def addProduct():
     global qualeExp
     global qualeQuant
     global qualeOpen
+    global optVar
+    global avvisiVar
+    global condText
+    avvisiVar = tk.StringVar()
+    condText = tk.StringVar()
+
     clear(answer)
     print("Add")
     action.set("Add product")
-    tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw", ipady=20)
+    tk.Label(answer, textvariable=action, justify="left").pack(anchor="nw")
+    tk.Label(answer, text="", justify="left").pack(anchor="nw")
     tk.Label(answer, text="Insert product name:", justify="left").pack(anchor="nw")
     qualeProd = tk.Entry(answer)
     qualeProd.pack(fill="x", anchor="nw")
     tk.Label(answer, text="Insert expiry date (DD/MM/YYYY):", justify="left").pack(anchor="nw")
-    qualeExp = tk.Entry(answer)
+    qualeExp = Calendar(answer,
+                font="Arial 14", selectmode='day', cursor="hand1")
     qualeExp.pack(fill="x", anchor="nw")
     tk.Label(answer, text="Insert quantity:", justify="left").pack(anchor="nw")
     qualeQuant = tk.Entry(answer)
     qualeQuant.pack(fill="x", anchor="nw")
-    tk.Label(answer, text="Optional values", justify="left").pack(anchor="nw")
-    tk.Label(answer, text="Add an opening date (DD/MM/YYYY):", justify="left").pack(anchor="nw")
-    qualeOpen = tk.Entry(answer)
+    tk.Label(answer, text="", justify="left").pack(anchor="nw")
+    optVar = tk.BooleanVar()
+    optValues = tk.Checkbutton(answer, text=" Optional values", justify="left", variable=optVar)
+    optValues.pack(anchor="nw")
+    tk.Label(answer, text="Add an opening date:", justify="left").pack(anchor="nw")
+    qualeOpen = Calendar(answer,
+                font="Arial 14", selectmode='day', cursor="hand1")
     qualeOpen.pack(fill="x", anchor="nw")
-    tk.Button(answer, text="Save", command=save).pack(anchor="nw")
 
-def save():
+    tk.Button(answer, text="Save", command=save1).pack(anchor="nw")
+
+    tk.Label(answer, text="").pack(anchor="nw")
+    tk.Label(answer, textvariable=condText, justify="left").pack(anchor="nw")
+    tk.Label(answer, textvariable=avvisiVar, justify="left").pack(anchor="nw")
+
+def save1():
+    avvisi.clear()
     saveProd()
     saveExp()
     saveQuant()
+    saveOptional()
     saveOpen()
+    if avvisi:
+        condText.set("Please correct the errors below.")
+        avvisiVar.set("\n".join(avvisi))
+    else:
+        condText.set("Product saved.")
+        qualeProd.delete(0, tk.END)
+        qualeQuant.delete(0, tk.END)
+        qualeExp.selection_clear()
+        qualeOpen.selection_clear()
+
+        root.after(3000, addProduct)
+
 def saveProd():
+    global savedProd
+    savedProd = None
     savedProd = qualeProd.get()
-    print(savedProd)
+    if savedProd == None or savedProd == "":
+        avvisi.append("Add a product name.")
 def saveExp():
-    savedExp = qualeExp.get()
-    print(savedExp)
+    global savedExp
+    savedExp = None
+    savedExp = qualeExp.get_date()
+    if savedExp == None or savedExp == "":
+        avvisi.append("Insert an expiry date.")
 def saveQuant():
+    global savedQuant
     savedQuant = qualeQuant.get()
-    print(savedQuant)
+    if savedQuant == None or savedQuant.isdigit() == False:
+        avvisi.append("Quantity is blank or not a number.")
 def saveOpen():
-    savedOpen = qualeOpen.get()
-    print(savedOpen)
+    global savedOpen
+    if savedOpt:
+        savedOpen = qualeOpen.get_date()
+    else:
+        savedOpen = "-"
+def saveOptional():
+    global savedOpt
+    savedOpt = optVar.get()
+
 
 def removeProduct():
     clear(answer)
@@ -152,7 +201,7 @@ if __name__ == '__main__':
         saved = ""
         root = tk.Tk()
         root.title("MedVault")
-        root.geometry("500x500")
+        root.geometry("500x650")
         root.resizable(False, False)
         action = tk.StringVar()
 
