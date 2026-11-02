@@ -37,8 +37,7 @@ LINUX (could change from distro to distro):
 
 ### Advices
 - On Windows, you should and need to resize your window because some elements may appear broken on the original dimensions. I wouldn't reccomend doing this on Linux, where everything should fit nicely.
-- When using the program from the ...-linux or .exe file the exit button won't work.
-
+  
 ## FAQ
 
 #### What operating systems does MedVault run on?
