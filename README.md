@@ -23,6 +23,9 @@ A Python script that makes medication management smart and easy, reducing waste 
 - Get warnings when a product is about to expire and when it's expired
 - Add opening dates to remember and know whether a product is still good for use
 
+## How and why I made it
+I made MedVault with python and with a book you can find in docs/book.pdf, made by ChatGPT, where i learned Python and its methods.
+I felt the need to make this program because a lot of families, including mine, end up wasting and forgetting that they have medications and just buy others. This program was made to stop waste in pharmaceutical products and to get the list a little more tidy.
 
 ## Installing and running
 WINDOWS:
